@@ -52,7 +52,7 @@ func (t *readDirFile) handler() server.ToolHandlerFunc {
 				return err
 			}
 			if !info.IsDir() {
-				files = append(files, path)
+				files = append(files, strings.ReplaceAll(path, "\\", "/"))
 			}
 			return nil
 		})

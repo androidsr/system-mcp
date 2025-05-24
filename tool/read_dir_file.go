@@ -24,14 +24,9 @@ func ReadDirFile() server.ServerTool {
 func (t *readDirFile) tool() mcp.Tool {
 	t.Tool = mcp.NewTool("readDirFile",
 		mcp.WithDescription("此工具可以读取指定目录以及子目录下的文件有哪些，并返回每个文件的全路径"),
-		mcp.WithString("filename",
+		mcp.WithString("dir",
 			mcp.Required(),
-			mcp.Description("文件名称"),
-		),
-		mcp.WithString("content",
-			mcp.Required(),
-			mcp.Description("文件内容"),
-			mcp.Required(),
+			mcp.Description("文件目录"),
 		),
 	)
 	return t.Tool

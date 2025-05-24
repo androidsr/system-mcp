@@ -2,9 +2,12 @@ package tool
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -23,7 +26,7 @@ func CopyFile() server.ServerTool {
 
 func (t *copyFile) tool() mcp.Tool {
 	t.Tool = mcp.NewTool("copyFile",
-		mcp.WithDescription("此工具可以复制系统中的文件到指定目录"),
+		mcp.WithDescription("此工具可以将文件复制到指定目录"),
 		mcp.WithString("sourceFile",
 			mcp.Required(),
 			mcp.Description("源文件路径"),
@@ -42,23 +45,25 @@ func (t *copyFile) handler() server.ToolHandlerFunc {
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
 		}
+		sourceFile = strings.ReplaceAll(sourceFile, "\\", "/")
 
 		targetFile, err := request.RequireString("targetFile")
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
 		}
-
+		targetFile = strings.ReplaceAll(targetFile, "\\", "/")
+		fmt.Println("sourceFile: " + sourceFile)
+		fmt.Println("targetFile: " + targetFile)
+		time.Sleep(1000)
 		//如果文件已经存在，则忽略该文件
-		if _, err := os.Stat(targetFile); err == nil {
+		if _, err = os.Stat(targetFile); err == nil {
 			return mcp.NewToolResultText("文件已经存在: " + targetFile), nil
 		}
 
 		// 判断目录是否存在, 如果不存在则创建
-		dir := filepath.Dir(targetFile)
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				return mcp.NewToolResultError("无法创建目录: " + err.Error()), nil
-			}
+		dirPath := filepath.Dir(targetFile)
+		if err = os.MkdirAll(dirPath, 0755); err != nil {
+			return mcp.NewToolResultError("无法创建目录: " + err.Error()), nil
 		}
 
 		// 复制文件

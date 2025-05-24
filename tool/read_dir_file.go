@@ -38,9 +38,10 @@ func (t *readDirFile) handler() server.ToolHandlerFunc {
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
 		}
+		dir = strings.ReplaceAll(dir, "\\", "/")
 
 		// 判断目录是否存在
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if _, err = os.Stat(dir); os.IsNotExist(err) {
 			return mcp.NewToolResultError("目录不存在: " + dir), nil
 		}
 

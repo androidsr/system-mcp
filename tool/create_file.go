@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -42,6 +43,7 @@ func (t *systemFile) handler() server.ToolHandlerFunc {
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
 		}
+		filename = strings.ReplaceAll(filename, "\\", "/")
 
 		content, err := request.RequireString("content")
 		if err != nil {

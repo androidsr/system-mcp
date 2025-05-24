@@ -22,7 +22,7 @@ func main() {
 		server.WithRecovery(),
 	)
 
-	s.AddTools(tool.CreateFile(), tool.ReadDirFile())
+	s.AddTools(tool.CreateFile(), tool.ReadDirFile(), tool.CopyFile())
 
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("MCP Server错误: %v\n", err)

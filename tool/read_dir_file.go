@@ -15,7 +15,7 @@ type readDirFile struct {
 }
 
 func ReadDirFile() server.ServerTool {
-	tool := systemFile{}
+	tool := readDirFile{}
 	tool.Tool = tool.tool()
 	tool.Handler = tool.handler()
 	return tool.ServerTool

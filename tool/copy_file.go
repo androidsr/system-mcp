@@ -2,12 +2,10 @@ package tool
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -41,23 +39,21 @@ func (t *copyFile) tool() mcp.Tool {
 
 func (t *copyFile) handler() server.ToolHandlerFunc {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+
 		sourceFile, err := request.RequireString("sourceFile")
 		if err != nil {
-			return mcp.NewToolResultError(err.Error()), nil
+			return mcp.NewToolResultError("获取参数sourceFile失败" + " \n"), nil
 		}
 		sourceFile = strings.ReplaceAll(sourceFile, "\\", "/")
 
 		targetFile, err := request.RequireString("targetFile")
 		if err != nil {
-			return mcp.NewToolResultError(err.Error()), nil
+			return mcp.NewToolResultError("获取参数targetFile失败" + " \n"), nil
 		}
 		targetFile = strings.ReplaceAll(targetFile, "\\", "/")
-		fmt.Println("sourceFile: " + sourceFile)
-		fmt.Println("targetFile: " + targetFile)
-		time.Sleep(1000)
 		//如果文件已经存在，则忽略该文件
 		if _, err = os.Stat(targetFile); err == nil {
-			return mcp.NewToolResultText("文件已经存在: " + targetFile), nil
+			return mcp.NewToolResultError("文件已经存在: " + targetFile + " \n"), nil
 		}
 
 		// 判断目录是否存在, 如果不存在则创建

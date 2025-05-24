@@ -55,6 +55,6 @@ func (t *readDirFile) handler() server.ToolHandlerFunc {
 			}
 			return nil
 		})
-		return mcp.NewToolResultText(strings.Join(files, ",")), nil
+		return mcp.NewToolResultText(strings.Join(files, " \n")), nil
 	}
 }

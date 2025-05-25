@@ -29,10 +29,10 @@ func ReadHtml() server.ServerTool {
 
 func (t *readHtml) tool() mcp.Tool {
 	t.Tool = mcp.NewTool("readHtml",
-		mcp.WithDescription("此工具可以读取指定网页中的内容"),
+		mcp.WithDescription("此工具可以读取指定网页的正文内容"),
 		mcp.WithString("url",
 			mcp.Required(),
-			mcp.Description("文件名称"),
+			mcp.Description("网页地址"),
 		),
 	)
 	return t.Tool
@@ -54,9 +54,9 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 		}
 		defer pw.Stop()
 
-		browserPath := "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-		showBrowser := false
-		interval := 0.0 // 可设置延时毫秒
+		browserPath := "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+		showBrowser := true
+		interval := 700.00 // 可设置延时毫秒
 
 		// 3. 启动浏览器
 		browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
@@ -82,12 +82,12 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 			return mcp.NewToolResultError("打开浏览器页面失败"), nil
 		}
 
-		if _, err := page.Goto(url); err != nil {
+		if _, err = page.Goto(url); err != nil {
 			return mcp.NewToolResultError("打开指定地址失败"), nil
 		}
 
 		// 5. 注入 Readability 脚本
-		readabilityCode, err := os.ReadFile("./Readability.js")
+		readabilityCode, err := os.ReadFile("D:/dev/go/work/system-mcp/Readability.js")
 		if err != nil {
 			return mcp.NewToolResultError("加载 JS 插件失败"), nil
 		}
@@ -115,7 +115,7 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 		}
 		defer newPage.Close()
 
-		if err := newPage.SetContent(content.(string), playwright.PageSetContentOptions{
+		if err = newPage.SetContent(content.(string), playwright.PageSetContentOptions{
 			WaitUntil: playwright.WaitUntilStateDomcontentloaded,
 		}); err != nil {
 			return mcp.NewToolResultError("设置页面内容失败"), nil
@@ -123,7 +123,7 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 
 		// 8. 保存 PDF
 		savePath := path.Join(WorkDir, "temp", time.Now().Format("2006-01-02"))
-		if err := os.MkdirAll(savePath, 0755); err != nil {
+		if err = os.MkdirAll(savePath, 0755); err != nil {
 			return mcp.NewToolResultError("创建目录失败"), nil
 		}
 		pdfPath := path.Join(savePath, sno.GetString()+".pdf")

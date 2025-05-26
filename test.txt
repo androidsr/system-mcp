@@ -1,0 +1,326 @@
+Go 语言的标准库非常好用。通常情况下，你不需要任何额外的库来完成任务。
+
+但是在某些情况下，可能需要使用一些库。今天将与你分享日常工作中很有用的 10 个 Go 库：
+
+1. cmp
+
+该包旨在成为 reflect.DeepEqual 的更强大、更安全的替代品，用于比较两个值是否在语义上相等。它仅用于测试中，因为性能不是目标，如果无法比较这些值，可能会导致程序崩溃。
+
+Example:
+
+// This Transformer sorts a []int.
+ trans := cmp.Transformer("Sort", func(in []int) []int {
+  out := append([]int(nil), in...) // Copy input to avoid mutating it
+  sort.Ints(out)
+  return out
+ })
+
+ x := struct{ Ints []int }{[]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}
+ y := struct{ Ints []int }{[]int{2, 8, 0, 9, 6, 1, 4, 7, 3, 5}}
+ z := struct{ Ints []int }{[]int{0, 0, 1, 2, 3, 4, 5, 6, 7, 8}}
+
+ fmt.Println(cmp.Equal(x, y, trans))
+ fmt.Println(cmp.Equal(y, z, trans))
+ fmt.Println(cmp.Equal(z, x, trans))
+
+相关链接[1]
+
+2. protobuf
+
+该项目托管了协议缓冲区（Protocol Buffers）的 Go 语言实现，协议缓冲区是一种与语言无关、平台无关、可扩展的机制，用于序列化结构化数据。协议缓冲区语言是一种用于指定结构化数据模式的语言。
+
+Protocol buffers:
+
+协议缓冲区（Protocol Buffers）是 Google 的一种与语言无关、平台无关、可扩展的机制，用于序列化结构化数据。可以将其想象成 XML，但它更小、更快、更简单。你只需定义一次数据的结构，然后就可以使用特殊生成的源代码轻松地将结构化数据写入各种数据流中，并从中读取，同时还可以使用各种编程语言进行操作。
+
+相关链接[2]
+
+3. fsnotify
+
+fsnotify 是一个 Go 语言库，用于在 Windows、Linux、macOS、BSD 和 illumos 上提供跨平台的文件系统通知功能。
+
+Example:
+
+package main
+
+import (
+    "log"
+
+    "github.com/fsnotify/fsnotify"
+)
+
+func main() {
+    // Create new watcher.
+    watcher, err := fsnotify.NewWatcher()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer watcher.Close()
+
+    // Start listening for events.
+    go func() {
+        for {
+            select {
+            case event, ok := <-watcher.Events:
+                if !ok {
+                    return
+                }
+                log.Println("event:", event)
+                if event.Has(fsnotify.Write) {
+                    log.Println("modified file:", event.Name)
+                }
+            case err, ok := <-watcher.Errors:
+                if !ok {
+                    return
+                }
+                log.Println("error:", err)
+            }
+        }
+    }()
+
+    // Add a path.
+    err = watcher.Add("/tmp")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Block main goroutine forever.
+    <-make(chan struct{})
+}
+
+相关链接[3]
+
+4. pretty
+
+该包利用反射来检查 Go 值，并可以以漂亮、对齐的方式打印出来。它支持三种模式（普通、紧凑和扩展）以供高级使用。
+
+Examples:
+
+package main
+
+import (
+ "github.com/kylelemons/godebug/pretty"
+)
+
+func main() {
+ type ShipManifest struct {
+  Name     string
+  Crew     map[string]string
+  Androids int
+  Stolen   bool
+ }
+
+ manifest := &ShipManifest{
+  Name: "Spaceship Heart of Gold",
+  Crew: map[string]string{
+   "Zaphod Beeblebrox": "Galactic President",
+   "Trillian":          "Human",
+   "Ford Prefect":      "A Hoopy Frood",
+   "Arthur Dent":       "Along for the Ride",
+  },
+  Androids: 1,
+  Stolen:   true,
+ }
+
+ pretty.Print(manifest)
+
+}
+
+相关链接[4]
+
+5. diff
+
+diff 实现了一种逐行的差异算法。
+
+Example result:
+
+-:wq
+ We the People of the United States, in Order to form a more perfect Union,
+ establish Justice, insure domestic Tranquility, provide for the common defence,
+-and secure the Blessings of Liberty to ourselves
++promote the general Welfare, and secure the Blessings of Liberty to ourselves
+ and our Posterity, do ordain and establish this Constitution for the United
+ States of America.
+
+
+相关链接[5]
+
+6. cases
+
+Package cases 提供了通用和特定语言的大小写映射器。
+
+Examples:
+
+package main
+
+import (
+ "fmt"
+
+ "golang.org/x/text/cases"
+ "golang.org/x/text/language"
+)
+
+func main() {
+ src := []string{
+  "hello world!",
+  "i with dot",
+  "'n ijsberg",
+  "here comes O'Brian",
+ }
+ for _, c := range []cases.Caser{
+  cases.Lower(language.Und),
+  cases.Upper(language.Turkish),
+  cases.Title(language.Dutch),
+  cases.Title(language.Und, cases.NoLower),
+ } {
+  fmt.Println()
+  for _, s := range src {
+   fmt.Println(c.String(s))
+  }
+ }
+
+}
+
+相关链接[6]
+
+7. cli
+
+cli 是一个简单、快速、有趣的 Go 语言包，用于构建命令行应用程序。其目标是让开发人员以富有表现力的方式编写快速且可分发的命令行应用程序。
+
+Examples:
+
+func main() {
+ app := &cli.App{
+    Name: "greet",
+    Usage: "say a greeting",
+    Action: func(c *cli.Context) error {
+     fmt.Println("Greetings")
+     return nil
+    },
+ }
+
+ app.Run(os.Args)
+}
+
+相关链接[7]
+
+8. Testify
+
+Go 代码（golang）是一组提供了许多工具的软件包，用于确保您的代码将按照您的意图运行。
+
+Examples:
+
+package yours
+
+import (
+  "testing"
+  "github.com/stretchr/testify/assert"
+)
+
+func TestSomething(t *testing.T) {
+
+  // assert equality
+  assert.Equal(t, 123, 123, "they should be equal")
+
+  // assert inequality
+  assert.NotEqual(t, 123, 456, "they should not be equal")
+
+  // assert for nil (good for errors)
+  assert.Nil(t, object)
+
+  // assert for not nil (good when you expect something)
+  if assert.NotNil(t, object) {
+
+    // now we know that object isn't nil, we are safe to make
+    // further assertions without causing any errors
+    assert.Equal(t, "Something", object.Value)
+
+  }
+
+}
+
+相关链接[8]
+
+9. go-homedir
+
+用于检测和扩展用户的主目录，无需使用cgo。
+
+Examples[9]
+
+10. gabs
+
+用于在Go中解析、创建和编辑未知或动态JSON的包。
+
+Examples:
+
+jsonParsed, err := gabs.ParseJSON([]byte(`{
+ "outer":{
+  "inner":{
+   "value1":10,
+   "value2":22
+  },
+  "alsoInner":{
+   "value1":20,
+   "array1":[
+    30, 40
+   ]
+  }
+ }
+}`))
+if err != nil {
+ panic(err)
+}
+
+var value float64
+var ok bool
+
+value, ok = jsonParsed.Path("outer.inner.value1").Data().(float64)
+// value == 10.0, ok == true
+
+value, ok = jsonParsed.Search("outer", "inner", "value1").Data().(float64)
+// value == 10.0, ok == true
+
+value, ok = jsonParsed.Search("outer", "alsoInner", "array1", "1").Data().(float64)
+// value == 40.0, ok == true
+
+相关链接[10]
+
+参考资料[1]
+
+cmp: https://pkg.go.dev/github.com/google/go-cmp/cmp
+
+[2]
+
+protobuf: https://pkg.go.dev/google.golang.org/protobuf
+
+[3]
+
+fsnotify: https://pkg.go.dev/github.com/fsnotify/fsnotify#section-readme
+
+[4]
+
+pretty: https://pkg.go.dev/github.com/kylelemons/godebug/pretty?utm_source=godoc#example-Print
+
+[5]
+
+diff: https://pkg.go.dev/github.com/kylelemons/godebug@v1.1.0/diff
+
+[6]
+
+cases: https://pkg.go.dev/golang.org/x/text@v0.14.0/cases#example-package
+
+[7]
+
+cli: https://pkg.go.dev/github.com/urfave/cli/v2#section-readme
+
+[8]
+
+testify: https://pkg.go.dev/github.com/stretchr/testify#section-readme
+
+[9]
+
+go-homedir: https://github.com/mitchellh/go-homedir
+
+[10]
+
+gabs: https://github.com/Jeffail/gabs

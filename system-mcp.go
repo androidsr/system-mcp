@@ -22,7 +22,6 @@ func main() {
 		return
 	}
 	defer pw.Stop()
-
 	s := server.NewMCPServer(
 		"system-mcp-go",
 		"1.0.0",

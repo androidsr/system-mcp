@@ -3,9 +3,7 @@ package tool
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
-	"time"
 
 	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
 	"github.com/androidsr/sc-go/sno"
@@ -26,11 +24,6 @@ func ReadHtml() server.ServerTool {
 	tool := readHtml{}
 	tool.Tool = tool.tool()
 	tool.Handler = tool.handler()
-	_, err := tool.getHtmlContent("https://products.groupdocs.app/zh/conversion/html-to-md#:~:text=%E8%BD%BB%E6%9D%BE%E5%9C%B0%E5%9C%A8%E7%BA%BF%E8%BD%AC%E6%8D%A2%E6%82%A8%E7%9A%84HTML%E6%96%87%E4%BB%B6%EF%BC%8C%E6%97%A0%E9%9C%80%E6%B3%A8%E5%86%8C%E3%80%82%20%E4%BB%8EWindows%EF%BC%8CLinux%E6%88%96MacOS%E8%BD%AC%E6%8D%A2%E6%82%A8%E7%9A%84HTML%E6%96%87%E6%A1%A3%E3%80%82%20%E5%8F%AA%E9%9C%80%E5%B0%86%E6%96%87%E4%BB%B6%E6%8B%96%E6%94%BE%E5%88%B0%E4%B8%8A%E4%BC%A0%E8%A1%A8%E5%8D%95%E4%B8%AD%EF%BC%8C%E9%80%89%E6%8B%A9%E6%89%80%E9%9C%80%E7%9A%84%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F%EF%BC%8C%E7%84%B6%E5%90%8E%E5%8D%95%E5%87%BB%E2%80%9C%E8%BD%AC%E6%8D%A2%E2%80%9D%E6%8C%89%E9%92%AE%E3%80%82,%E8%BD%AC%E6%8D%A2%E5%AE%8C%E6%88%90%E5%90%8E%EF%BC%8C%E6%82%A8%E5%8F%AF%E4%BB%A5%E4%B8%8B%E8%BD%BDMD%E6%96%87%E4%BB%B6%E3%80%82%20%E6%A0%B9%E6%8D%AEHTML%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F%E5%92%8C%E6%A0%BC%E5%BC%8F%EF%BC%8C%E8%BD%AC%E6%8D%A2%E5%8F%AF%E8%83%BD%E9%9C%80%E8%A6%81%E4%B8%80%E4%BA%9B%E7%89%87%E5%88%BB%EF%BC%8C%E4%BD%86%E6%98%AF%E5%A4%A7%E5%A4%9A%E6%95%B0%E6%96%87%E4%BB%B6%E4%BC%9A%E8%BF%85%E9%80%9F%E8%BD%AC%E6%8D%A2%E3%80%82%20%E5%80%9F%E5%8A%A9%E9%AB%98%E7%BA%A7%E5%8A%9F%E8%83%BD%EF%BC%8C%E6%82%A8%E5%8F%AF%E4%BB%A5%E5%B0%86%E5%8F%97%E5%AF%86%E7%A0%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%96%87%E6%A1%A3%E8%BD%AC%E6%8D%A2%E5%B9%B6%E5%B0%86%E7%BB%93%E6%9E%9C%E5%8F%91%E9%80%81%E5%88%B0%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6%E3%80%82")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	time.Sleep(10000000)
 	return tool.ServerTool
 }
 

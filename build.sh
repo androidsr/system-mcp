@@ -1,2 +1,2 @@
-COOS=windows go.exe install
+COOS=windows go install
 go install

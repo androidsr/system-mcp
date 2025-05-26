@@ -91,15 +91,9 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 			return mcp.NewToolResultError("打开指定地址失败"), nil
 		}
 
-		// 5. 注入 Readability 脚本
-		readabilityCode, err := os.ReadFile("D:/dev/go/work/system-mcp/Readability.js")
-		if err != nil {
-			return mcp.NewToolResultError("加载 JS 插件失败"), nil
-		}
-		if _, err = page.Evaluate(string(readabilityCode)); err != nil {
+		if _, err = page.Evaluate(Readability); err != nil {
 			return mcp.NewToolResultError("注入 JS 插件失败"), nil
 		}
-
 		// 6. 提取正文内容
 		content, err := page.Evaluate(`() => {
 			try {

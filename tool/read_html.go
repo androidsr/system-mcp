@@ -48,8 +48,13 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 		fmt.Println("处理 URL:", url)
 
 		// 2. 启动 Playwright
+
 		pw, err := playwright.Run()
 		if err != nil {
+			err = playwright.Install()
+			if err != nil {
+				return nil, fmt.Errorf("安装 Playwright 失败: %v", err)
+			}
 			return nil, fmt.Errorf("无法启动 Playwright: %v", err)
 		}
 		defer pw.Stop()

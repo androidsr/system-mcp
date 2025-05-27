@@ -27,7 +27,6 @@ func ReadHtml() server.ServerTool {
 	tool := readHtml{}
 	tool.Tool = tool.tool()
 	tool.Handler = tool.handler()
-	tool.getHtmlContent("https://docs.pingcode.com/baike/3402542")
 	return tool.ServerTool
 }
 
@@ -107,7 +106,7 @@ func (t *readHtml) getHtmlContent(currentUrl string) (string, error) {
 	// 解析 URL
 	u, err := url.Parse(currentUrl)
 	if err != nil {
-		panic(err)
+		return "", errors.New("解析URL失败")
 	}
 	article, err := readability.FromReader(strings.NewReader(htmlContent), u)
 	if err != nil {
@@ -117,6 +116,6 @@ func (t *readHtml) getHtmlContent(currentUrl string) (string, error) {
 	if err != nil {
 		return "", errors.New("转换成 Markdown 失败")
 	}
-	os.WriteFile("test.md", []byte(markdown), 0644)
+	os.WriteFile("E:\\temp\\test.md", []byte(markdown), 0644)
 	return markdown, nil
 }

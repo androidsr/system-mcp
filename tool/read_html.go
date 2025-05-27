@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net/url"
-	"os"
 	"strings"
 
 	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
@@ -116,6 +115,6 @@ func (t *readHtml) getHtmlContent(currentUrl string) (string, error) {
 	if err != nil {
 		return "", errors.New("转换成 Markdown 失败")
 	}
-	os.WriteFile("E:\\temp\\test.md", []byte(markdown), 0644)
+	//os.WriteFile("E:\\temp\\test.md", []byte(markdown), 0644)
 	return markdown, nil
 }

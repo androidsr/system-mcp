@@ -5,7 +5,7 @@
 ##### 将文件加入环境变量或运行时直接指定完整路径
 ###### 配置mcp 并指定文件输出目录。
 ```
-  system-mcp.exe e:/
+  system-mcp.exe e:/ C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
 ```
 
 ### 支持功能

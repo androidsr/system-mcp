@@ -3,11 +3,14 @@ package tool
 import (
 	"context"
 	"errors"
+	"net/url"
 	"os"
+	"strings"
 
 	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
 	"github.com/androidsr/sc-go/sno"
 	"github.com/androidsr/sc-go/syaml"
+	readability "github.com/go-shiori/go-readability"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/playwright-community/playwright-go"
@@ -24,6 +27,7 @@ func ReadHtml() server.ServerTool {
 	tool := readHtml{}
 	tool.Tool = tool.tool()
 	tool.Handler = tool.handler()
+	tool.getHtmlContent("https://docs.pingcode.com/baike/3402542")
 	return tool.ServerTool
 }
 
@@ -53,7 +57,7 @@ func (t *readHtml) handler() server.ToolHandlerFunc {
 	}
 }
 
-func (t *readHtml) getHtmlContent(url string) (string, error) {
+func (t *readHtml) getHtmlContent(currentUrl string) (string, error) {
 	// 2. 启动 Playwright
 	pw, err := playwright.Run()
 	if err != nil {
@@ -66,8 +70,7 @@ func (t *readHtml) getHtmlContent(url string) (string, error) {
 	}
 	defer pw.Stop()
 
-	browserPath := "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-	showBrowser := true
+	showBrowser := false
 	interval := 700.00 // 可设置延时毫秒
 
 	// 3. 启动浏览器
@@ -94,42 +97,23 @@ func (t *readHtml) getHtmlContent(url string) (string, error) {
 		return "", errors.New("打开浏览器页面失败")
 	}
 
-	if _, err = page.Goto(url); err != nil {
+	if _, err = page.Goto(currentUrl); err != nil {
 		return "", errors.New("打开指定地址失败")
 	}
-
-	if _, err = page.Evaluate(Readability); err != nil {
-		return "", errors.New("注入 JS 插件失败")
-	}
-	// 6. 提取正文内容
-	content, err := page.Evaluate(`() => {
-		try {
-			const article = new Readability(document.cloneNode(true)).parse();
-			return article?.content || '未提取到内容';
-		} catch (e) {
-			return 'Readability 提取失败: ' + e.toString();
-		}
-	}`)
+	htmlContent, err := page.Content()
 	if err != nil {
-		return "", errors.New("自动获取文本内容失败")
+		return "", errors.New("获取页面内容失败")
 	}
-	// 7. 渲染为 PDF 页面
-	newPage, err := context.NewPage()
+	// 解析 URL
+	u, err := url.Parse(currentUrl)
 	if err != nil {
-		return "", errors.New("创建 PDF 页面失败")
+		panic(err)
 	}
-	defer newPage.Close()
-
-	if err = newPage.SetContent(content.(string), playwright.PageSetContentOptions{
-		WaitUntil: playwright.WaitUntilStateDomcontentloaded,
-	}); err != nil {
-		return "", errors.New("设置页面内容失败")
-	}
-	htmlContent, err := newPage.Content()
+	article, err := readability.FromReader(strings.NewReader(htmlContent), u)
 	if err != nil {
-		return "", errors.New("获取html页面失败")
+		return "", errors.New("获取文章内容失败")
 	}
-	markdown, err := htmltomarkdown.ConvertString(htmlContent)
+	markdown, err := htmltomarkdown.ConvertString(article.Content)
 	if err != nil {
 		return "", errors.New("转换成 Markdown 失败")
 	}

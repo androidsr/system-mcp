@@ -14,7 +14,11 @@ func main() {
 		fmt.Println("此工具不支持命令行参数")
 		return
 	}
-	tool.Init(os.Args[1])
+	if len(os.Args) == 2 {
+		tool.Init(os.Args[1], "")
+	} else if len(os.Args) == 3 {
+		tool.Init(os.Args[1], os.Args[2])
+	}
 	// 2. 启动 Playwright
 	pw, err := playwright.Run()
 	if err != nil {
